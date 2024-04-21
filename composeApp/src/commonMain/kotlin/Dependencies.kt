@@ -12,19 +12,20 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import swapi.EntitySourceImpl
 import swapi.local.EntityInMemorySourceImpl
-import swapi.remote.PeopleRemoteImpl
-import swapi.remote.StarshipRemoteImpl
+import swapi.remote.EntityRemoteSourceImpl
+import swapi.remote.RemotePeople
+import swapi.remote.RemoteStarship
 
 object Dependencies {
     private val swClient: HttpClient = provideSWClient()
     val favoriteSource: FavoriteSource = FavoriteSourceImpl()
     val starshipSource: EntitySource<Starship> = EntitySourceImpl(
         localSource = EntityInMemorySourceImpl(),
-        remoteSource = StarshipRemoteImpl(swClient)
+        remoteSource = EntityRemoteSourceImpl<Starship, RemoteStarship>(swClient, "starships")
     )
     val peopleSource: EntitySource<People> = EntitySourceImpl(
         localSource = EntityInMemorySourceImpl(),
-        remoteSource = PeopleRemoteImpl(swClient)
+        remoteSource = EntityRemoteSourceImpl<People, RemotePeople>(swClient, "people")
     )
     private fun provideSWClient(): HttpClient = HttpClient {
         install(Resources)
@@ -37,5 +38,4 @@ object Dependencies {
             url("https://swapi.dev/")
         }
     }
-
 }
